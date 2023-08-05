@@ -2,40 +2,27 @@
 
 class User
 {
-    public $db;
-
+    /** string collection */
     private $collection = "users";
 
-    public $userCollection;
+    public $userColl;
 
     public function __construct() {
         global $db;
-
-        $this->db = $db;
-
-        if ( $this->checkIfCollectionExist() ) {
-            $this->userCollection = $db->selectCollection($this->collection);
-        } else {
-            $this->userCollection = $db->createCollection($this->collection);
-        }
-    }
-
-    private function checkIfCollectionExist () {
-        foreach ($this->db->listCollectionNames() as $collectionName) {
-            if ( $collectionName == $this->collection ) return true;
-        }
+        // 
+        $this->userColl = $db->selectCollection($this->collection);
     }
 
     public function findUser( string $email ) : object|null
     {
-        $user = $this->userCollection->findOne(['email' => $email]);
+        $user = $this->userColl->findOne(['email' => $email]);
         
         return $user; // returns null if not found
     }
 
     public function findAllUser() : array
     {
-        $results = $this->userCollection->find(
+        $results = $this->userColl->find(
             [],
             [
                 'limit' => 5,
@@ -57,7 +44,7 @@ class User
 
         if ( $this->findUser($email) !== null ) throw new Exception("User already exists!", 1);
          
-        $insertRes = $this->userCollection->insertOne([
+        $insertRes = $this->userColl->insertOne([
             'fullname' => $fullname,
             'email' => $email,
             'gender' => $gender
@@ -76,7 +63,7 @@ class User
 
         if ( $this->findUser($email) === null ) throw new Exception("User does not exists!", 1);
 
-        $updateRes = $this->userCollection->updateOne(
+        $updateRes = $this->userColl->updateOne(
             ['email' => $email],
             ['$set' => ['gender' => $gender, 'fullname' => $fullname]]
         );
@@ -88,7 +75,7 @@ class User
 
     public function deleteUser( string $email ) : string
     {        
-        $deleteRes = $this->userCollection->deleteOne(['email' => $email]);
+        $deleteRes = $this->userColl->deleteOne(['email' => $email]);
 
         // printf("Deleted %d document\n", $deleteRes->getDeletedCount());
 

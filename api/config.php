@@ -23,7 +23,19 @@ if ( isset($db) ) return;
 
 $db = (new MongoDB\Client)->mdb;
 
-// $result = $db->createCollection('testCollection');
+function createCollectionIfNotExist($db) {
+    $collections = ["users", "products"];
+    // 
+    $colls = [];
+    foreach ($db->listCollectionNames() as $collectionName) $colls[] = $collectionName;
+    // 
+    foreach ($collections as $coll) {
+        if ( !in_array($coll, $colls) ) {
+            $db->createCollection($coll);
+        }
+    }
+}
+// createCollectionIfNotExist($db);
 
 spl_autoload_register(function($class){
     $filepath = str_replace(
